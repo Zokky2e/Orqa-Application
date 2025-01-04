@@ -1,18 +1,19 @@
 ﻿using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Asn1.X509;
-using Orqa_Application.Views;
+using Orqa_Application.Services;
 using System;
-using System.Collections.Generic;
-using Tmds.DBus.Protocol;
+using System.Data;
 
 namespace Orqa_Application.ViewModels
 {
     public partial class LoginViewModel : ViewModelBase
     {
+        private readonly NavigationService _navigationService;
+        private readonly UserService _userService;
+        private MySqlConnection mySqlConnection { get; set; }
+
         [ObservableProperty]
         public string username = "";
 
@@ -25,20 +26,19 @@ namespace Orqa_Application.ViewModels
         [ObservableProperty]
         public bool hasResult = true;
 
-
         public IRelayCommand LoginCommand { get; }
 
-        private MySqlConnection mySqlConnection { get; set; }
-
-        public LoginViewModel()
+        public LoginViewModel(NavigationService navigationService, UserService userService)
         {
+            _navigationService = navigationService;
+            _userService = userService;
             LoginCommand = new RelayCommand(OnLogin);
+
             string sqlConnectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=workstationdb";
             mySqlConnection = new MySqlConnection(sqlConnectionString);
         }
         private void OnLogin()
         {
-
             string query = "SELECT id, password FROM users WHERE username = @Username LIMIT 1";
             MySqlCommand command = new MySqlCommand(query, mySqlConnection);
             command.CommandTimeout = 60;
@@ -80,40 +80,10 @@ namespace Orqa_Application.ViewModels
 
         private void RedirectLoggedInUser(int userId)
         {
-            string query = "SELECT roles.name FROM roles inner join user_roles on user_roles.roleId = roles.id inner join users on users.id = user_roles.userId where users.id = @UserId;";
-            MySqlCommand command = new MySqlCommand(query, mySqlConnection);
-            command.CommandTimeout = 60;
-            command.Parameters.AddWithValue("@UserId", userId);
-            try
-            {
-                MySqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    reader.Read();
-                    string role = reader.GetString(0);
-                    if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-                    {
-                        desktop.MainWindow?.Hide();
-                        if (role == "admin")
-                        {
-                            var adminWindow = new AdminWindow();
-                            desktop.MainWindow = adminWindow;
-                            desktop.MainWindow.Show();
-                        }
-                        else if (role == "user")
-                        {
-                            var userWindow = new UserWindow();
-                            desktop.MainWindow = userWindow;
-                            desktop.MainWindow.Show();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Result = "An error occurred!";
-                HasResult = false;
-            }
+            string role = _userService.CheckSession(userId);
+            _navigationService.RedirectLoggedInUser(userId, role);
+            _userService.SaveSession(userId);
         }
+
     }
 }
