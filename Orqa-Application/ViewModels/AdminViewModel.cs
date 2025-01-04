@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MySql.Data.MySqlClient;
+using Orqa_Application.Services;
 using System;
 using System.Collections.Generic;
 
@@ -21,15 +22,21 @@ namespace Orqa_Application.ViewModels
         public bool hasResult = true;
 
 
-        public IRelayCommand LoginCommand { get; }
+        public IRelayCommand LogoutCommand { get; }
 
-        public AdminViewModel()
+        public UserService _userService;
+        public NavigationService _navigationService;
+
+        public AdminViewModel(NavigationService navigationService, UserService userService)
         {
-            LoginCommand = new RelayCommand(OnLogin);
+            _navigationService = navigationService;
+            _userService = userService;
+            LogoutCommand = new RelayCommand(OnLogout);
         }
-        private void OnLogin()
+        private void OnLogout()
         {
-            
+            _userService.ClearSession();
+            _navigationService.RedirectLoggedInUser(0);
         }
     }
 }

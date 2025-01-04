@@ -16,7 +16,8 @@ namespace Orqa_Application.Services
 
         public void SaveSession(int userId)
         {
-            string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "session.txt");
+            string sessionFilePath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "session.txt");
             File.WriteAllText(sessionFilePath, userId.ToString());
         }
 
@@ -31,7 +32,9 @@ namespace Orqa_Application.Services
 
         public string? CheckSession(int userId)
         {
-            string query = "SELECT roles.name FROM roles INNER JOIN user_roles ON user_roles.roleId = roles.id INNER JOIN users ON users.id = user_roles.userId WHERE users.id = @UserId;";
+            string query = @"SELECT roles.name FROM roles 
+            INNER JOIN user_roles ON user_roles.roleId = roles.id 
+            INNER JOIN users ON users.id = user_roles.userId WHERE users.id = @UserId;";
             MySqlCommand command = new MySqlCommand(query, mySqlConnection);
             command.CommandTimeout = 60;
             command.Parameters.AddWithValue("@UserId", userId);

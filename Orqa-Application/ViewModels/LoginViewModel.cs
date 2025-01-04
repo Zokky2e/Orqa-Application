@@ -80,7 +80,7 @@ namespace Orqa_Application.ViewModels
 
         private void RedirectLoggedInUser(int userId)
         {
-            string role = _userService.CheckSession(userId);
+            string? role = _userService.CheckSession(userId);
             _navigationService.RedirectLoggedInUser(userId, role);
             _userService.SaveSession(userId);
         }
