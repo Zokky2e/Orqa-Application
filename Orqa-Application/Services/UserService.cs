@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
+using Orqa_Application.Models;
 using System;
 using System.IO;
 
@@ -7,11 +8,12 @@ namespace Orqa_Application.Services
 {
     public class UserService
     {
-        private MySqlConnection mySqlConnection { get; set; }
-        public UserService()
+        public UserModel CurrentUser {  get; set; } = new UserModel();
+        public UserWorkPositionModel? UserWorkPosition { get; set; }
+        public ConnectionService ConnectionService { get; set; }
+        public UserService(ConnectionService connectionService) 
         {
-            string sqlConnectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=workstationdb";
-            mySqlConnection = new MySqlConnection(sqlConnectionString);
+            ConnectionService = connectionService;
         }
 
         public void SaveSession(int userId)
@@ -32,21 +34,53 @@ namespace Orqa_Application.Services
 
         public string? CheckSession(int userId)
         {
-            string query = @"SELECT roles.name FROM roles 
+            string query = @"SELECT 
+            roles.name, 
+            roles.id,
+            users.username,
+            users.firstname,
+            users.lastname,
+            work_positions.name
+            FROM roles 
             INNER JOIN user_roles ON user_roles.roleId = roles.id 
-            INNER JOIN users ON users.id = user_roles.userId WHERE users.id = @UserId;";
-            MySqlCommand command = new MySqlCommand(query, mySqlConnection);
+            INNER JOIN users ON users.id = user_roles.userId 
+            LEFT JOIN user_work_positions ON users.id = user_work_positions.userId 
+            LEFT JOIN work_positions ON work_positions.id = user_work_positions.work_positionId 
+            WHERE users.id = @UserId;";
+            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
             command.CommandTimeout = 60;
             command.Parameters.AddWithValue("@UserId", userId);
             string? role = null;
             try
             {
-                mySqlConnection.Open();
+                ConnectionService.MySqlConnection.Open();
                 MySqlDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
                 {
                     reader.Read();
                     role = reader.GetString(0);
+                    CurrentUser = new UserModel()
+                    {
+                        Id = userId,
+                        Role = new RoleModel()
+                        {
+                            Id = reader.GetInt32(1),
+                            Name = reader.GetString(0)
+                        },
+                        Username = reader.GetString(2),
+                        Firstname = reader.GetString(3),
+                        Lastname = reader.GetString(4),
+                    };
+                    if (!reader.IsDBNull(5)) {
+                        UserWorkPosition = new UserWorkPositionModel()
+                        {
+                            User = CurrentUser,
+                            WorkPosition = new WorkPositionModel()
+                            {
+                                Name = reader.GetString(5),
+                            }
+                        };
+                    }
                 }
             }
             catch (Exception ex)
@@ -54,7 +88,7 @@ namespace Orqa_Application.Services
             }
             finally
             {
-                mySqlConnection.Close();
+                ConnectionService.MySqlConnection.Close();
             }
             return role;
         }

@@ -1,18 +1,16 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Orqa_Application.Services;
-using Orqa_Application.ViewModels;
-using ReactiveUI;
 
-namespace Orqa_Application.Views
+namespace Orqa_Application.Controls
 {
-    public partial class AdminWindow : Window
+    public partial class WorkTableControl : UserControl
     {
-        public AdminWindow()
+        public WorkTableControl()
         {
             InitializeComponent();
         }
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);

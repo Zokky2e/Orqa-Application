@@ -5,16 +5,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="using:Orqa_Application.Controls"
         xmlns:vm="using:Orqa_Application.ViewModels"
         x:CompileBindings="False"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Admin">
 
-  <Grid>
-    <TabControl Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+  <Grid RowDefinitions="80,auto">
+      <controls:UserCardControl Grid.Row="0"/>
+    <TabControl Grid.Row="1" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top">
       <TabItem Header="View Assignments" Cursor="Hand">
-        <TextBlock Margin="5">This is tab 1 content</TextBlock>
+        <controls:WorkTableControl/>
       </TabItem>
       <TabItem Header="Edit Assignments" Cursor="Hand">
         <TextBlock Margin="5">This is tab 2 content</TextBlock>
@@ -23,6 +25,11 @@
         <TextBlock Margin="5">This is tab 3 content</TextBlock>
       </TabItem>
     </TabControl>
-    <Button Cursor="Hand" Margin="5" HorizontalAlignment="Right" VerticalAlignment="Top">Logout</Button>
+    <Button 
+      Command="{Binding LogoutCommand}" 
+      Cursor="Hand" Margin="5" 
+      HorizontalAlignment="Right" VerticalAlignment="Top">
+      Logout
+    </Button>
   </Grid>
 </Window>

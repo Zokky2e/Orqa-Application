@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Orqa_Application.Controls.WorkTableControl"
+             xmlns:vm="using:Orqa_Application.ViewModels"
+             xmlns:model="using:Orqa_Application.Models"
+             x:DataType="vm:AdminViewModel"
+             Background="AliceBlue">
+  <StackPanel>
+
+    <Button
+      Command="{Binding ReloadCommand}"
+      Cursor="Hand" Margin="5"
+      HorizontalAlignment="Right" VerticalAlignment="Top">
+      Refresh
+    </Button>
+  <DataGrid Margin="20" ItemsSource="{Binding UserWorkPositionList}"
+          IsReadOnly="True"
+          CanUserReorderColumns="True"
+          CanUserResizeColumns="True"
+          CanUserSortColumns="False"
+          GridLinesVisibility="All"
+          AutoGenerateColumns="False"
+          BorderThickness="1" BorderBrush="Gray">
+    <DataGrid.Columns>
+      <DataGridTextColumn Header="Workstation" Binding="{Binding WorkPosition.Name}" Width="*" />
+      <DataGridTextColumn Header="First Name"  Binding="{Binding User.Firstname}" Width="*" />
+      <DataGridTextColumn Header="Last Name" Binding="{Binding User.Lastname}" Width="*" />
+      <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="*"/>
+      <DataGridTextColumn Header="Created" Binding="{Binding DateCreated}" Width="*"/>
+    </DataGrid.Columns>
+  </DataGrid>
+  </StackPanel>
+</UserControl>

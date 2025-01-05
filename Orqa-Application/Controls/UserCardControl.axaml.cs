@@ -1,15 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Orqa_Application.Services;
-using Orqa_Application.ViewModels;
-using ReactiveUI;
 
-namespace Orqa_Application.Views
+namespace Orqa_Application.Controls
 {
-    public partial class AdminWindow : Window
+    public partial class UserCardControl : UserControl
     {
-        public AdminWindow()
+        public UserCardControl()
         {
             InitializeComponent();
         }

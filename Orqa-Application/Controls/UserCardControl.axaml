@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="110"
+             x:Class="Orqa_Application.Controls.UserCardControl"
+             xmlns:vm="using:Orqa_Application.ViewModels"
+             xmlns:model="using:Orqa_Application.Models"
+             x:DataType="vm:AdminViewModel">
+  <StackPanel>
+    <StackPanel Orientation="Horizontal">
+      <StackPanel Margin="15 5 15 5" Orientation="Horizontal">
+        <TextBlock Margin="5" Text="First Name:" FontWeight="Bold"/>
+        <TextBlock Margin="5" Text="{Binding User.Firstname}"/>
+      </StackPanel>
+      <StackPanel Margin="15 5 15 5" Orientation="Horizontal">
+        <TextBlock Margin="5" Text="Last Name:" FontWeight="Bold"/>
+        <TextBlock Margin="5" Text="{Binding User.Lastname}"/>
+      </StackPanel>
+      <StackPanel Margin="15 5 15 5" Orientation="Horizontal">
+        <TextBlock Margin="5" Text="Username:" FontWeight="Bold"/>
+        <TextBlock Margin="5" Text="{Binding User.Username}"/>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel>
+      <StackPanel Margin="15 5" Orientation="Horizontal">
+        <TextBlock Margin="5" Text="Role:" FontWeight="Bold"/>
+        <TextBlock Margin="20 5" Text="{Binding User.Role.Name}"/>
+      </StackPanel>
+      <StackPanel Margin="15 5" IsVisible="{Binding HasWorkPosition}" Orientation="Horizontal">
+        <TextBlock Margin="5" Text="Work Position:" FontWeight="Bold"/>
+        <TextBlock Margin="20 5" Text="{Binding UserWorkPosition.WorkPosition.Name}"/>
+      </StackPanel>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

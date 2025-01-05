@@ -22,7 +22,7 @@
     <TextBlock Text="Password:"/>
     <TextBox PasswordChar="*" Text="{Binding Password}" Margin="0,5"/>
 
-    <Button Content="Login" Command="{Binding LoginCommand}" Margin="0,10"/>
+    <Button IsEnabled="True" Content="Login" Command="{Binding LoginCommand}" Margin="0,10" Cursor="Hand"/>
     <TextBlock IsEnabled="{Binding HasResult, Mode=OneWay}" Text="{Binding Result}" Foreground="Red"/>
   </StackPanel>
   </Grid>

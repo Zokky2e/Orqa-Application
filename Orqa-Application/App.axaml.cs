@@ -25,8 +25,10 @@ namespace Orqa_Application
             {
                 DisableAvaloniaDataAnnotationValidation();
                 string sessionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "session.txt");
-                var navigationService = new NavigationService();
-                var userService = new UserService();
+                var connectionService = new ConnectionService();
+                var workPositionService = new WorkPositionService(connectionService);
+                var userService = new UserService(connectionService);
+                var navigationService = new NavigationService(userService, workPositionService);
                 if (File.Exists(sessionFilePath))
                 {
                     int userId = int.Parse(File.ReadAllText(sessionFilePath));

@@ -14,37 +14,44 @@ namespace Orqa_Application.Services
 {
     public class NavigationService
     {
-        public NavigationService() { }
+        UserService UserService;
+        WorkPositionService WorkPositionService;
+        public NavigationService(UserService userService, WorkPositionService workPositionService) 
+        {
+            UserService = userService;
+            WorkPositionService = workPositionService;
+        }
         public void RedirectLoggedInUser(int userId, string? role = null)
         {
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                Window targetWindow = new Window();
                 desktop.MainWindow?.Hide();
+                Window targetWindow;
                 if (role == null)
                 {
-                    targetWindow = new LoginWindow();
-                } 
+                    var loginViewModel = new LoginViewModel(this, UserService);
+                    targetWindow = new LoginWindow
+                    {
+                        DataContext = loginViewModel
+                    };
+                }
+                else if (role == "admin")
+                {
+                    var adminViewModel = new AdminViewModel(this, UserService, WorkPositionService);
+
+                    targetWindow = new AdminWindow()
+                    {
+                        DataContext = adminViewModel
+                    };
+                }
                 else
                 {
-                    if (role == "admin")
-                    {
-                        var adminViewModel = new AdminViewModel(this, new UserService());
+                    var userViewModel = new UserViewModel();
 
-                        targetWindow = new AdminWindow()
-                        {
-                            DataContext = adminViewModel
-                        };
-                    }
-                    else
+                    targetWindow = new UserWindow()
                     {
-                        var userViewModel = new UserViewModel();
-
-                        targetWindow = new UserWindow()
-                        {
-                            DataContext = userViewModel
-                        };
-                    }
+                        DataContext = userViewModel
+                    };
                 }
                 desktop.MainWindow = targetWindow;
                 desktop.MainWindow.Show();
