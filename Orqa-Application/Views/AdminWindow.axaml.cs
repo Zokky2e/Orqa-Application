@@ -14,7 +14,6 @@ namespace Orqa_Application.Views
             InitializeComponent();
             this.Opened += (s, e) =>
             {
-                // Force DataGrid refresh
                 (this.DataContext as AdminViewModel)?.GetWorkPositions();
             };
         }

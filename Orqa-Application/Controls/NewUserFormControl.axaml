@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Orqa_Application.Controls.NewUserFormControl"
+             xmlns:vm="using:Orqa_Application.ViewModels"
+             xmlns:model="using:Orqa_Application.Models"
+             x:DataType="vm:AdminViewModel">
+  <Grid ColumnDefinitions="auto,auto" ShowGridLines="True">
+    <StackPanel Grid.Column="0" Margin="15" Width="280" HorizontalAlignment="Center" VerticalAlignment="Top">
+      <TextBlock Text="Add new user" FontWeight="SemiBold" FontSize="24"/>
+      <TextBlock Text="Username:"/>
+      <TextBox Text="{Binding NewUser.Username}" Margin="0,5"/>
+      <TextBlock Text="Firstname:"/>
+      <TextBox Text="{Binding NewUser.Firstname}" Margin="0,5"/>
+      <TextBlock Text="Lastname:"/>
+      <TextBox Text="{Binding NewUser.Lastname}" Margin="0,5"/>
+      <TextBlock Text="Password:"/>
+      <TextBox Text="{Binding NewUserPassword}" Margin="0,5"/>
+      <Button Command="{Binding AddNewUserCommand}">Add</Button>
+    </StackPanel>
+    <StackPanel Grid.Column="1" Margin="15" Width="280" HorizontalAlignment="Center" VerticalAlignment="Top">
+      <TextBlock Text="Add new work position" FontWeight="SemiBold" FontSize="24"/>
+      <TextBlock Text="Name:"/>
+      <TextBox Text="{Binding NewWorkPosition.Name}" Margin="0,5"/>
+      <TextBlock Text="Description:"/>
+      <TextBox Text="{Binding NewWorkPosition.Description}" Margin="0,5"/>
+      <Button Command="{Binding AddNewWPCommand}">Add</Button>
+    </StackPanel>
+  </Grid>
+</UserControl>

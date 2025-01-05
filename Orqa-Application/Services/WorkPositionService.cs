@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Orqa_Application.Services
 {
@@ -17,7 +18,33 @@ namespace Orqa_Application.Services
         {
             ConnectionService = connectionService;
         }
+        public void AddWorkPosition(WorkPositionModel workPosition)
+        {
+            if (workPosition == null)
+            {
+                return;
+            }
 
+            string addWorkPositionQuery = "INSERT INTO `work_positions` (`id`, `name`, `description`) VALUES(NULL, @Name, @Description)";
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand();
+                command.CommandText = addWorkPositionQuery;
+                command.Parameters.AddWithValue("@Name", workPosition.Name);
+                command.Parameters.AddWithValue("@Description", workPosition.Description);
+                command.Connection = ConnectionService.MySqlConnection;
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding work position", ex);
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+        }
         public ObservableCollection<UserWorkPositionModel> GetUserWorkPositions()
         {
             var workpositions = new ObservableCollection<UserWorkPositionModel>();

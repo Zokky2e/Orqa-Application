@@ -16,11 +16,16 @@ namespace Orqa_Application.ViewModels
     {
         public IRelayCommand LogoutCommand { get; }
         public IRelayCommand ReloadCommand { get; }
+        public IRelayCommand AddNewUserCommand { get; }
+        public IRelayCommand AddNewWPCommand { get; }
 
         public UserService _userService;
         public NavigationService _navigationService;
         public WorkPositionService _workPositionService;
         public UserModel User {  get; set; }
+        public UserModel NewUser { get; set; } = new UserModel() { Role = new RoleModel()};
+        public WorkPositionModel NewWorkPosition { get; set; } = new WorkPositionModel();
+        public string NewUserPassword { get; set; } = "";
         public UserWorkPositionModel? UserWorkPosition { get; set; } = null;
         public bool HasWorkPosition { get; set; } = false;
         public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; } = new ObservableCollection<UserWorkPositionModel>();
@@ -37,11 +42,50 @@ namespace Orqa_Application.ViewModels
             HasWorkPosition = _userService.UserWorkPosition != null;
             LogoutCommand = new RelayCommand(OnLogout);
             ReloadCommand = new RelayCommand(OnReloadWorkPositions);
+            AddNewUserCommand = new RelayCommand(OnAddNewUserCommand);
+            AddNewWPCommand = new RelayCommand(OnAddNewWPCommand);
         }
 
         private void OnReloadWorkPositions()
         {
             GetWorkPositions();
+        }
+        private void OnAddNewUserCommand()
+        {
+            if (string.IsNullOrWhiteSpace(NewUser.Username) ||
+            string.IsNullOrWhiteSpace(NewUser.Firstname) ||
+            string.IsNullOrWhiteSpace(NewUser.Lastname) ||
+            string.IsNullOrWhiteSpace(NewUserPassword) || NewUserPassword.Length < 8)
+            {
+                return;
+            }
+            try
+            {
+                _userService.AddUser(NewUser, NewUserPassword);
+                NewUser = new UserModel();
+                NewUserPassword = string.Empty;
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private void OnAddNewWPCommand()
+        {
+            if (string.IsNullOrWhiteSpace(NewWorkPosition.Name) ||
+            string.IsNullOrWhiteSpace(NewWorkPosition.Description))
+            {
+                return;
+            }
+            try
+            {
+                _workPositionService.AddWorkPosition(NewWorkPosition);
+
+                NewWorkPosition = new WorkPositionModel();
+            }
+            catch (Exception ex)
+            {
+            }
         }
         private void OnLogout()
         {

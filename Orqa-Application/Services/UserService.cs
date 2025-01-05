@@ -1,8 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using MySqlX.XDevAPI.Common;
 using Orqa_Application.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Transactions;
 
 namespace Orqa_Application.Services
 {
@@ -14,6 +17,50 @@ namespace Orqa_Application.Services
         public UserService(ConnectionService connectionService) 
         {
             ConnectionService = connectionService;
+        }
+
+        public void AddUser(UserModel user, string password)
+        {
+            if (user == null)
+            {
+                return;
+            }
+            MySqlTransaction transaction = null;
+            string addUserQuery = "INSERT INTO `users` (`username`, `firstname`, `lastname`, `password`) VALUES(@Username, @Firstname, @Lastname, @Password)";
+            string addUserRoleQuery = "INSERT INTO `user-roles` (`userId`, `roleId`) VALUES(@UserId, @RoleId)";
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                transaction = ConnectionService.MySqlConnection.BeginTransaction();
+                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                {
+                    command.Connection = ConnectionService.MySqlConnection;
+                    command.CommandText = addUserQuery;
+                    command.Parameters.AddWithValue("@Username", user.Username);
+                    command.Parameters.AddWithValue("@Firstname", user.Firstname);
+                    command.Parameters.AddWithValue("@Lastname", user.Lastname);
+                    command.Parameters.AddWithValue("@Password", BCrypt.Net.BCrypt.HashPassword(password));
+                    command.CommandTimeout = 60;
+                    command.ExecuteNonQuery();
+                    int newUserIdAfterCommit;
+                    command.CommandText = "SELECT LAST_INSERT_ID";
+                    newUserIdAfterCommit = Convert.ToInt32(command.ExecuteScalar());
+                    command.CommandText = addUserRoleQuery;
+                    command.Parameters.AddWithValue("@UserId", newUserIdAfterCommit);
+                    command.Parameters.AddWithValue("@RoleId", 2);
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                transaction?.Rollback();
+                throw new Exception("Error adding user", ex);
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
         }
 
         public void SaveSession(int userId)
