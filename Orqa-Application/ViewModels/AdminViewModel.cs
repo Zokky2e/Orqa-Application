@@ -4,6 +4,7 @@ using DynamicData;
 using MySql.Data.MySqlClient;
 using Orqa_Application.Models;
 using Orqa_Application.Services;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +12,7 @@ using System.Reactive.Linq;
 
 namespace Orqa_Application.ViewModels
 {
-    public partial class AdminViewModel : ViewModelBase
+    public partial class AdminViewModel : ReactiveObject
     {
         public IRelayCommand LogoutCommand { get; }
         public IRelayCommand ReloadCommand { get; }
@@ -22,7 +23,7 @@ namespace Orqa_Application.ViewModels
         public UserModel User {  get; set; }
         public UserWorkPositionModel? UserWorkPosition { get; set; } = null;
         public bool HasWorkPosition { get; set; } = false;
-        public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; set; }
+        public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; } = new ObservableCollection<UserWorkPositionModel>();
         public AdminViewModel(
             NavigationService navigationService, 
             UserService userService, 
@@ -36,7 +37,6 @@ namespace Orqa_Application.ViewModels
             HasWorkPosition = _userService.UserWorkPosition != null;
             LogoutCommand = new RelayCommand(OnLogout);
             ReloadCommand = new RelayCommand(OnReloadWorkPositions);
-            GetWorkPositions();
         }
 
         private void OnReloadWorkPositions()
@@ -49,9 +49,9 @@ namespace Orqa_Application.ViewModels
             _navigationService.RedirectLoggedInUser(0);
         }
 
-        private void GetWorkPositions()
+        public void GetWorkPositions()
         {
-            UserWorkPositionList = _workPositionService.GetUserWorkPositions();
+            var userWorkPositionModels = _workPositionService.GetUserWorkPositions();
             var testData = new ObservableCollection<UserWorkPositionModel>()
             {
                 new UserWorkPositionModel()
@@ -79,7 +79,12 @@ namespace Orqa_Application.ViewModels
                     DateCreated = DateTime.Now,
                 }
             };
-            UserWorkPositionList.AddRange(testData);
+            userWorkPositionModels.AddRange(testData);
+            UserWorkPositionList.Clear();
+            foreach (var item in userWorkPositionModels)
+            {
+                UserWorkPositionList.Add(item);
+            }
         }
     }
 }
