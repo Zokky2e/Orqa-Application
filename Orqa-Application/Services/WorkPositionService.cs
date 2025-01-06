@@ -24,20 +24,26 @@ namespace Orqa_Application.Services
             {
                 return;
             }
-
+            MySqlTransaction transaction = null;
             string addWorkPositionQuery = "INSERT INTO `work_positions` (`id`, `name`, `description`) VALUES(NULL, @Name, @Description)";
             try
             {
                 ConnectionService.MySqlConnection.Open();
-                MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand();
-                command.CommandText = addWorkPositionQuery;
-                command.Parameters.AddWithValue("@Name", workPosition.Name);
-                command.Parameters.AddWithValue("@Description", workPosition.Description);
-                command.Connection = ConnectionService.MySqlConnection;
-                command.ExecuteNonQuery();
+                transaction = ConnectionService.MySqlConnection.BeginTransaction();
+                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                {
+                    command.Connection = ConnectionService.MySqlConnection; 
+                    command.CommandText = addWorkPositionQuery;
+                    command.Parameters.AddWithValue("@Name", workPosition.Name);
+                    command.Parameters.AddWithValue("@Description", workPosition.Description);
+                    command.CommandTimeout = 60;
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
             }
             catch (Exception ex)
             {
+                transaction?.Rollback();
                 throw new Exception("Error adding work position", ex);
             }
             finally

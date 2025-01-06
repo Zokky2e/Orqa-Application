@@ -11,5 +11,11 @@ namespace Orqa_Application.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        public WorkPositionModel() 
+        {
+            Name = string.Empty;
+            Description = string.Empty;
+        }
     }
 }

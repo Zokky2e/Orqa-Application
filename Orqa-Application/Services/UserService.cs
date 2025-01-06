@@ -27,7 +27,7 @@ namespace Orqa_Application.Services
             }
             MySqlTransaction transaction = null;
             string addUserQuery = "INSERT INTO `users` (`username`, `firstname`, `lastname`, `password`) VALUES(@Username, @Firstname, @Lastname, @Password)";
-            string addUserRoleQuery = "INSERT INTO `user-roles` (`userId`, `roleId`) VALUES(@UserId, @RoleId)";
+            string addUserRoleQuery = "INSERT INTO `user_roles` (`userId`, `roleId`) VALUES(@UserId, @RoleId)";
             try
             {
                 ConnectionService.MySqlConnection.Open();
@@ -42,9 +42,9 @@ namespace Orqa_Application.Services
                     command.Parameters.AddWithValue("@Password", BCrypt.Net.BCrypt.HashPassword(password));
                     command.CommandTimeout = 60;
                     command.ExecuteNonQuery();
-                    int newUserIdAfterCommit;
-                    command.CommandText = "SELECT LAST_INSERT_ID";
-                    newUserIdAfterCommit = Convert.ToInt32(command.ExecuteScalar());
+                    command.Parameters.Clear();
+                    command.CommandText = "SELECT LAST_INSERT_ID()";
+                    int newUserIdAfterCommit = Convert.ToInt32(command.ExecuteScalar());
                     command.CommandText = addUserRoleQuery;
                     command.Parameters.AddWithValue("@UserId", newUserIdAfterCommit);
                     command.Parameters.AddWithValue("@RoleId", 2);

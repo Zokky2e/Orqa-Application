@@ -11,21 +11,21 @@
     <StackPanel Grid.Column="0" Margin="15" Width="280" HorizontalAlignment="Center" VerticalAlignment="Top">
       <TextBlock Text="Add new user" FontWeight="SemiBold" FontSize="24"/>
       <TextBlock Text="Username:"/>
-      <TextBox Text="{Binding NewUser.Username}" Margin="0,5"/>
+      <TextBox Text="{Binding NewUser.Username, Mode=TwoWay}" Margin="0,5"/>
       <TextBlock Text="Firstname:"/>
-      <TextBox Text="{Binding NewUser.Firstname}" Margin="0,5"/>
+      <TextBox Text="{Binding NewUser.Firstname, Mode=TwoWay}" Margin="0,5"/>
       <TextBlock Text="Lastname:"/>
-      <TextBox Text="{Binding NewUser.Lastname}" Margin="0,5"/>
+      <TextBox Text="{Binding NewUser.Lastname, Mode=TwoWay}" Margin="0,5"/>
       <TextBlock Text="Password:"/>
-      <TextBox Text="{Binding NewUserPassword}" Margin="0,5"/>
+      <TextBox Text="{Binding NewUserPassword, Mode=TwoWay}" Margin="0,5"/>
       <Button Command="{Binding AddNewUserCommand}">Add</Button>
     </StackPanel>
     <StackPanel Grid.Column="1" Margin="15" Width="280" HorizontalAlignment="Center" VerticalAlignment="Top">
       <TextBlock Text="Add new work position" FontWeight="SemiBold" FontSize="24"/>
       <TextBlock Text="Name:"/>
-      <TextBox Text="{Binding NewWorkPosition.Name}" Margin="0,5"/>
+      <TextBox Text="{Binding NewWorkPosition.Name, Mode=TwoWay}" Margin="0,5"/>
       <TextBlock Text="Description:"/>
-      <TextBox Text="{Binding NewWorkPosition.Description}" Margin="0,5"/>
+      <TextBox Text="{Binding NewWorkPosition.Description, Mode=TwoWay}" Margin="0,5"/>
       <Button Command="{Binding AddNewWPCommand}">Add</Button>
     </StackPanel>
   </Grid>

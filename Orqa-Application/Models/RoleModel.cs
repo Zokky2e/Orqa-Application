@@ -12,5 +12,11 @@ namespace Orqa_Application.Models
         public string Name { get; set; }
         public string Description { get; set; }
 
+        public RoleModel() 
+        {
+            Name = string.Empty;
+            Description = string.Empty;
+        }
+
     }
 }

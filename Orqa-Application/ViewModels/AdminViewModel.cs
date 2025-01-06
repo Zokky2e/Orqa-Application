@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using System.Reactive;
 
 namespace Orqa_Application.ViewModels
 {
@@ -23,9 +24,24 @@ namespace Orqa_Application.ViewModels
         public NavigationService _navigationService;
         public WorkPositionService _workPositionService;
         public UserModel User {  get; set; }
-        public UserModel NewUser { get; set; } = new UserModel() { Role = new RoleModel()};
-        public WorkPositionModel NewWorkPosition { get; set; } = new WorkPositionModel();
-        public string NewUserPassword { get; set; } = "";
+        private UserModel _newUser = new UserModel();
+        public UserModel NewUser
+        {
+            get => _newUser;
+            set => this.RaiseAndSetIfChanged(ref _newUser, value);
+        }
+        private WorkPositionModel _newWorkPosition = new WorkPositionModel();
+        public WorkPositionModel NewWorkPosition
+        {
+            get => _newWorkPosition;
+            set => this.RaiseAndSetIfChanged(ref _newWorkPosition, value);
+        }
+        private string _newUserPassword;
+        public string NewUserPassword
+        {
+            get => _newUserPassword;
+            set => this.RaiseAndSetIfChanged(ref _newUserPassword, value); 
+        }
         public UserWorkPositionModel? UserWorkPosition { get; set; } = null;
         public bool HasWorkPosition { get; set; } = false;
         public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; } = new ObservableCollection<UserWorkPositionModel>();
