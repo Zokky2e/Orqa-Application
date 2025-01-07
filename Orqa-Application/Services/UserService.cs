@@ -181,6 +181,9 @@ namespace Orqa_Application.Services
                                 Name = reader.GetString(5),
                             }
                         };
+                    } else
+                    {
+                        UserWorkPosition = new UserWorkPositionModel();
                     }
                 }
             }

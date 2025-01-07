@@ -40,7 +40,7 @@ namespace Orqa_Application
                 }
                 else
                 {
-                    var loginViewModel = new LoginViewModel(navigationService, userService);
+                    var loginViewModel = new LoginViewModel(navigationService, userService, connectionService);
 
                     desktop.MainWindow = new LoginWindow
                     {

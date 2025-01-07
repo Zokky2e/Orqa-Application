@@ -54,7 +54,7 @@ namespace Orqa_Application.ViewModels
             _userService = userService;
             _workPositionService = workPositionService;
             AdminUserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
-            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers());
+            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers(), GetWorkPositions);
 
             LogoutCommand = new RelayCommand(OnLogout);
             ReloadCommand = new RelayCommand(OnReloadWorkPositions);

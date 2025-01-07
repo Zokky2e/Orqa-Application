@@ -12,7 +12,7 @@ namespace Orqa_Application.ViewModels
     {
         private readonly NavigationService _navigationService;
         private readonly UserService _userService;
-        private MySqlConnection mySqlConnection { get; set; }
+        private readonly ConnectionService _connectionService;
 
         [ObservableProperty]
         public string username = "";
@@ -28,25 +28,24 @@ namespace Orqa_Application.ViewModels
 
         public IRelayCommand LoginCommand { get; }
 
-        public LoginViewModel(NavigationService navigationService, UserService userService)
+        public LoginViewModel(NavigationService navigationService, UserService userService, ConnectionService connectionService)
         {
             _navigationService = navigationService;
             _userService = userService;
+            _connectionService = connectionService;
             LoginCommand = new RelayCommand(OnLogin);
-
-            string sqlConnectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=workstationdb";
-            mySqlConnection = new MySqlConnection(sqlConnectionString);
         }
         private void OnLogin()
         {
             string query = "SELECT id, password FROM users WHERE username = @Username LIMIT 1";
-            MySqlCommand command = new MySqlCommand(query, mySqlConnection);
+            MySqlCommand command = new MySqlCommand(query, _connectionService.MySqlConnection);
             command.CommandTimeout = 60;
             command.Parameters.AddWithValue("@Username", Username);
-
+            bool success = false;
+            int userId = 0;
             try
             {
-                mySqlConnection.Open();
+                _connectionService.MySqlConnection.Open();
                 MySqlDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
                 {
@@ -54,18 +53,20 @@ namespace Orqa_Application.ViewModels
                     string storedHashedPassword = reader.GetString(1);
                     if (BCrypt.Net.BCrypt.Verify(Password, storedHashedPassword))
                     {
-                        int userId = reader.GetInt32(0);
+                        userId = reader.GetInt32(0);
                         reader.Close();
-                        this.RedirectLoggedInUser(userId);
+                        success = true;
                     }
                     else
                     {
                         Result = "Incorrect credentials!";
+                        success = false;
                         HasResult = false;
                     }
                 }
                 else {
                     Result = "Incorrect credentials!";
+                    success = false;
                     HasResult = false;
                 }
             }catch(Exception e)
@@ -74,7 +75,11 @@ namespace Orqa_Application.ViewModels
             }
             finally
             {
-                mySqlConnection.Close();
+                _connectionService.MySqlConnection.Close();
+                if (success && userId != 0)
+                {
+                    this.RedirectLoggedInUser(userId);
+                }
             }
         }
 

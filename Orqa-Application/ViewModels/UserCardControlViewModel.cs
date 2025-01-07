@@ -33,8 +33,9 @@ namespace Orqa_Application.ViewModels
         public UserCardControlViewModel(UserModel user, UserWorkPositionModel? userWorkPosition = null)
         {
             User = user;
-            UserWorkPosition = userWorkPosition;
-            HasWorkPosition = userWorkPosition != null;
+            UserWorkPosition = userWorkPosition; 
+            HasWorkPosition = userWorkPosition != null && !string.IsNullOrWhiteSpace(userWorkPosition.WorkPosition?.Name);
+
         }
     }
 }

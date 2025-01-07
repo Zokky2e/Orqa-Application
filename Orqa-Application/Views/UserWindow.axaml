@@ -10,14 +10,16 @@
         x:CompileBindings="False"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
         Title="user">
 
 
-  <Grid RowDefinitions="80,auto">
-    <controls:UserCardControl DataContext="{Binding UserCardViewModel}"  Grid.Row="0"/>
+  <Grid RowDefinitions="120,auto" ColumnDefinitions="auto,auto">
+    <controls:UserCardControl DataContext="{Binding UserCardViewModel}"  Grid.Row="0" Grid.Column="0"/>
     <Button
       Command="{Binding LogoutCommand}"
       Cursor="Hand" Margin="5"
+      Grid.Column="1"
       HorizontalAlignment="Right" VerticalAlignment="Top">
       Logout
     </Button>

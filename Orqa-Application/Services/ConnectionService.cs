@@ -12,7 +12,7 @@ namespace Orqa_Application.Services
         public MySqlConnection MySqlConnection { get; set; }
         public ConnectionService()
         {
-            string sqlConnectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=workstationdb";
+            string sqlConnectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=workstationdb_test";
             MySqlConnection = new MySqlConnection(sqlConnectionString);
         }
     }

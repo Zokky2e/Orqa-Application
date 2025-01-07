@@ -30,7 +30,7 @@ namespace Orqa_Application.Services
                 Window targetWindow;
                 if (role == null)
                 {
-                    var loginViewModel = new LoginViewModel(this, UserService);
+                    var loginViewModel = new LoginViewModel(this, UserService, UserService.ConnectionService);
                     targetWindow = new LoginWindow
                     {
                         DataContext = loginViewModel

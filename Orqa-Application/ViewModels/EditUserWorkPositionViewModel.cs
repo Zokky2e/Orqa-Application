@@ -14,8 +14,10 @@ namespace Orqa_Application.ViewModels
 {
     public partial class EditUserWorkPositionViewModel : ReactiveViewModelBase
     {
+        private readonly Action _onWorkPositionUpdated;
         public IRelayCommand UpdateWorkPositionCommand { get; }
-        public WorkPositionService _workPositionService;
+        public WorkPositionService _workPositionService; 
+
         public ObservableCollection<WorkPositionModel> WorkPositionList { get; } = new ObservableCollection<WorkPositionModel>();
 
         private WorkPositionModel? _selectedWorkPosition;
@@ -35,7 +37,8 @@ namespace Orqa_Application.ViewModels
         }
         public EditUserWorkPositionViewModel(
             WorkPositionService workPositionService,
-            ObservableCollection<UserWorkPositionModel> availabelUsers)
+            ObservableCollection<UserWorkPositionModel> availabelUsers,
+            Action onWorkPositionUpdated)
         {
             _workPositionService = workPositionService;
             WorkPositionList = _workPositionService.GetWorkPositions();
@@ -56,6 +59,7 @@ namespace Orqa_Application.ViewModels
                 }
             });
             UpdateWorkPositionCommand = new RelayCommand(OnUpdateWorkPosition);
+            _onWorkPositionUpdated = onWorkPositionUpdated;
         }
 
         private void OnUpdateWorkPosition() 
@@ -74,6 +78,7 @@ namespace Orqa_Application.ViewModels
                 SelectedUser.WorkPosition = SelectedWorkPosition;
             }
             _workPositionService.UpadateWorkPosition(SelectedUser);
+            _onWorkPositionUpdated?.Invoke();
         }
     }
 }
