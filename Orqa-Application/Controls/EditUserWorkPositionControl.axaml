@@ -34,8 +34,12 @@
         </ComboBox.ItemTemplate>
       </ComboBox>
     </StackPanel>
+    <StackPanel Margin="20 0">
+      <TextBlock Margin="0 5" Text="2. Insert product name" FontWeight="DemiBold"/>
+      <TextBox Text="{Binding SelectedUser.ProductName}"/>
+    </StackPanel>
     <StackPanel Margin="20 30">
-    <Button>Update</Button>
+      <Button Command="{Binding UpdateWorkPositionCommand}" Content="Update" Cursor="Hand"/>
     </StackPanel>
   </StackPanel>
 </UserControl>

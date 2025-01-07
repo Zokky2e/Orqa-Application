@@ -54,8 +54,12 @@ namespace Orqa_Application.ViewModels
             _userService = userService;
             _workPositionService = workPositionService;
             AdminUserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
-            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService.GetWorkPositions(), _userService.GetAvailableUsers());
-            
+            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers());
+
+            LogoutCommand = new RelayCommand(OnLogout);
+            ReloadCommand = new RelayCommand(OnReloadWorkPositions);
+            AddNewUserCommand = new RelayCommand(OnAddNewUserCommand);
+            AddNewWPCommand = new RelayCommand(OnAddNewWPCommand);
         }
 
         private void OnReloadWorkPositions()
@@ -108,34 +112,6 @@ namespace Orqa_Application.ViewModels
         public void GetWorkPositions()
         {
             var userWorkPositionModels = _workPositionService.GetUserWorkPositions();
-            var testData = new ObservableCollection<UserWorkPositionModel>()
-            {
-                new UserWorkPositionModel()
-                {
-                    Id = 1,
-                    User = new UserModel() {Firstname="Pavo", Lastname="Pavic"},
-                    WorkPosition = new WorkPositionModel() {Name="Pavina Firma"},
-                    ProductName = "Test",
-                    DateCreated = DateTime.Now,
-                },
-                new UserWorkPositionModel()
-                {
-                    Id = 2,
-                    User = new UserModel() {Firstname="Pavo", Lastname="Pavic"},
-                    WorkPosition = new WorkPositionModel() {Name="Pavina Firma"},
-                    ProductName = "Test",
-                    DateCreated = DateTime.Now,
-                },
-                new UserWorkPositionModel()
-                {
-                    Id = 3,
-                    User = new UserModel() {Firstname="Pavo", Lastname="Pavic"},
-                    WorkPosition = new WorkPositionModel() {Name="Pavina Firma"},
-                    ProductName = "Test",
-                    DateCreated = DateTime.Now,
-                }
-            };
-            userWorkPositionModels.AddRange(testData);
             UserWorkPositionList.Clear();
             foreach (var item in userWorkPositionModels)
             {

@@ -25,7 +25,7 @@
           AutoGenerateColumns="False"
           BorderThickness="1" BorderBrush="Gray">
     <DataGrid.Columns>
-      <DataGridTextColumn Header="Workstation" Binding="{Binding WorkPosition.Name}" Width="*" />
+      <DataGridTextColumn Header="Work Position" Binding="{Binding WorkPosition.Name}" Width="*" />
       <DataGridTextColumn Header="First Name"  Binding="{Binding User.Firstname}" Width="*" />
       <DataGridTextColumn Header="Last Name" Binding="{Binding User.Lastname}" Width="*" />
       <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="*"/>

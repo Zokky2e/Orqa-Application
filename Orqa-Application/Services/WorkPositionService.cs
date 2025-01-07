@@ -1,4 +1,5 @@
-﻿using DynamicData;
+﻿using Avalonia.Win32.Interop.Automation;
+using DynamicData;
 using MySql.Data.MySqlClient;
 using Orqa_Application.Models;
 using System;
@@ -37,6 +38,160 @@ namespace Orqa_Application.Services
                     command.CommandText = addWorkPositionQuery;
                     command.Parameters.AddWithValue("@Name", workPosition.Name);
                     command.Parameters.AddWithValue("@Description", workPosition.Description);
+                    command.CommandTimeout = 60;
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                transaction?.Rollback();
+                throw new Exception("Error adding work position", ex);
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+        }
+
+        public void UpadateWorkPosition(UserWorkPositionModel userWorkPosition)
+        {
+            if (userWorkPosition.WorkPosition == null || string.IsNullOrWhiteSpace(userWorkPosition.WorkPosition.Name))
+            {
+                DeleteUserWorkPosition(userWorkPosition.User.Id);
+                return;
+            }
+            else
+            {
+                // Check if an entry for the user already exists
+                bool userWorkPositionExists = CheckUserWorkPositionExists(userWorkPosition.User.Id);
+
+                if (userWorkPositionExists)
+                {
+                    // Update the existing user work position entry
+                    UpdateUserWorkPosition(userWorkPosition);
+                }
+                else
+                {
+                    // Insert a new user work position entry
+                    InsertUserWorkPosition(userWorkPosition);
+                }
+            }
+        }
+        private void DeleteUserWorkPosition(int userId)
+        {
+            MySqlTransaction transaction = null;
+            string query = @"DELETE
+            FROM
+                user_work_positions
+            WHERE
+                userId = @UserId";
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                transaction = ConnectionService.MySqlConnection.BeginTransaction();
+                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                {
+                    command.Connection = ConnectionService.MySqlConnection;
+                    command.CommandText = query;
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.CommandTimeout = 60;
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                transaction?.Rollback();
+                throw new Exception("Error adding work position", ex);
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+        }
+
+        private bool CheckUserWorkPositionExists(int userId)
+        {
+            bool hasUser = false;
+            string query = "select exists (select 1 from user_work_positions where userId = @UserId limit 1) num";
+            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                command.Parameters.AddWithValue("@UserId", userId);
+                MySqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    hasUser = reader.GetInt32("num") > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding work position", ex);
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+            return hasUser;
+        }
+
+        private void UpdateUserWorkPosition(UserWorkPositionModel userWorkPositionModel)
+        {
+            string query = @"update user_work_positions
+                set
+                user_work_positions.work_positionId = @WorkPositionId,
+                user_work_positions.productName = @ProductName,
+                user_work_positions.dateCreated = @DateCreated
+                WHERE
+                user_work_positions.userId = @UserId;";
+            MySqlTransaction transaction = null;
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                transaction = ConnectionService.MySqlConnection.BeginTransaction();
+                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                {
+                    command.Connection = ConnectionService.MySqlConnection;
+                    command.CommandText = query;
+                    command.Parameters.AddWithValue("@WorkPositionId", userWorkPositionModel.WorkPosition.Id);
+                    command.Parameters.AddWithValue("@ProductName", userWorkPositionModel.ProductName);
+                    command.Parameters.AddWithValue("@DateCreated", DateTime.Now);
+                    command.Parameters.AddWithValue("@UserId", userWorkPositionModel.User.Id);
+                    command.CommandTimeout = 60;
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                transaction?.Rollback();
+                throw new Exception("Error adding work position", ex);
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+        }
+        private void InsertUserWorkPosition(UserWorkPositionModel userWorkPositionModel)
+        {
+            string query = @"insert into user_work_positions
+                (`id`, `userId`, `work_positionId`, `productName`, `dateCreated`) values (NULL, @UserId, @WorkPositionId, @ProductName, @DateCreated);";
+            MySqlTransaction transaction = null;
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                transaction = ConnectionService.MySqlConnection.BeginTransaction();
+                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                {
+                    command.Connection = ConnectionService.MySqlConnection;
+                    command.CommandText = query;
+                    command.Parameters.AddWithValue("@WorkPositionId", userWorkPositionModel.WorkPosition.Id);
+                    command.Parameters.AddWithValue("@ProductName", userWorkPositionModel.ProductName);
+                    command.Parameters.AddWithValue("@DateCreated", DateTime.Now);
+                    command.Parameters.AddWithValue("@UserId", userWorkPositionModel.User.Id);
                     command.CommandTimeout = 60;
                     command.ExecuteNonQuery();
                     transaction.Commit();
