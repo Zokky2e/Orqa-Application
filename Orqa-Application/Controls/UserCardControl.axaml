@@ -6,7 +6,7 @@
              x:Class="Orqa_Application.Controls.UserCardControl"
              xmlns:vm="using:Orqa_Application.ViewModels"
              xmlns:model="using:Orqa_Application.Models"
-             x:DataType="vm:AdminViewModel">
+             x:DataType="vm:UserCardControlViewModel">
   <StackPanel>
     <StackPanel Orientation="Horizontal">
       <StackPanel Margin="15 5 15 5" Orientation="Horizontal">

@@ -13,7 +13,7 @@ using System.Reactive;
 
 namespace Orqa_Application.ViewModels
 {
-    public partial class AdminViewModel : ReactiveObject
+    public partial class AdminViewModel : ReactiveViewModelBase
     {
         public IRelayCommand LogoutCommand { get; }
         public IRelayCommand ReloadCommand { get; }
@@ -23,7 +23,7 @@ namespace Orqa_Application.ViewModels
         public UserService _userService;
         public NavigationService _navigationService;
         public WorkPositionService _workPositionService;
-        public UserModel User {  get; set; }
+
         private UserModel _newUser = new UserModel();
         public UserModel NewUser
         {
@@ -42,9 +42,9 @@ namespace Orqa_Application.ViewModels
             get => _newUserPassword;
             set => this.RaiseAndSetIfChanged(ref _newUserPassword, value); 
         }
-        public UserWorkPositionModel? UserWorkPosition { get; set; } = null;
-        public bool HasWorkPosition { get; set; } = false;
         public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; } = new ObservableCollection<UserWorkPositionModel>();
+        public UserCardControlViewModel AdminUserCardViewModel { get; }
+        public EditUserWorkPositionViewModel EditUserWorkPositionViewModel { get; }
         public AdminViewModel(
             NavigationService navigationService, 
             UserService userService, 
@@ -53,13 +53,9 @@ namespace Orqa_Application.ViewModels
             _navigationService = navigationService;
             _userService = userService;
             _workPositionService = workPositionService;
-            User = _userService.CurrentUser;
-            UserWorkPosition = _userService.UserWorkPosition;
-            HasWorkPosition = _userService.UserWorkPosition != null;
-            LogoutCommand = new RelayCommand(OnLogout);
-            ReloadCommand = new RelayCommand(OnReloadWorkPositions);
-            AddNewUserCommand = new RelayCommand(OnAddNewUserCommand);
-            AddNewWPCommand = new RelayCommand(OnAddNewWPCommand);
+            AdminUserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
+            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService.GetWorkPositions(), _userService.GetAvailableUsers());
+            
         }
 
         private void OnReloadWorkPositions()

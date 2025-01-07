@@ -26,7 +26,7 @@ namespace Orqa_Application
 
         public bool Match(object? data)
         {
-            return data is ViewModelBase;
+            return data is ObservableViewModelBase;
         }
     }
 }

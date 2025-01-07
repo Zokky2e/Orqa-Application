@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using System.IO;
 using Orqa_Application.ViewModels;
+using ReactiveUI;
 
 namespace Orqa_Application.Services
 {
@@ -46,7 +47,7 @@ namespace Orqa_Application.Services
                 }
                 else
                 {
-                    var userViewModel = new UserViewModel();
+                    var userViewModel = new UserViewModel(this, UserService);
 
                     targetWindow = new UserWindow()
                     {

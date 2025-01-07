@@ -14,5 +14,12 @@ namespace Orqa_Application.Models
         public UserModel User { get; set; }
         public string ProductName { get; set; }
         public DateTime DateCreated { get; set; }
+
+        public UserWorkPositionModel() {
+            WorkPosition = new WorkPositionModel();
+            User = new UserModel();
+            ProductName = string.Empty;
+            DateCreated = DateTime.Now;
+        }
     }
 }

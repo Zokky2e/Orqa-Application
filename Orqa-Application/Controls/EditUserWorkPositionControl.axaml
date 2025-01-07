@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Orqa_Application.Controls.EditUserWorkPositionControl"
+             xmlns:vm="using:Orqa_Application.ViewModels"
+             xmlns:model="using:Orqa_Application.Models"
+             x:DataType="vm:EditUserWorkPositionViewModel">
+  <StackPanel Margin="20" Orientation="Horizontal">
+    <StackPanel Margin="20 0">
+      <TextBlock Margin="0 5" Text="1. Select user" FontWeight="DemiBold"/>
+      <ComboBox x:Name="AvailableUserList"
+              ItemsSource="{Binding AvailableUserList, Mode=TwoWay}"
+              SelectedItem="{Binding SelectedUser, Mode=TwoWay}"
+              Width="200" MaxDropDownHeight="300">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding User.Fullname}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+    <StackPanel Margin="20 0">
+      <TextBlock Margin="0 5" Text="2. Select work position" FontWeight="DemiBold"/>
+      <ComboBox x:Name="WorkPositionList"
+                ItemsSource="{Binding WorkPositionList, Mode=TwoWay}"
+                SelectedItem="{Binding SelectedWorkPosition, Mode=TwoWay}"
+                Width="200" MaxDropDownHeight="300">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+    <StackPanel Margin="20 30">
+    <Button>Update</Button>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

@@ -12,14 +12,14 @@
         WindowStartupLocation="CenterScreen"
         Title="Admin">
 
-  <Grid RowDefinitions="80,auto">
-      <controls:UserCardControl Grid.Row="0"/>
+  <Grid RowDefinitions="100,auto">
+      <controls:UserCardControl DataContext="{Binding AdminUserCardViewModel}" Grid.Row="0"/>
     <TabControl Grid.Row="1" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top">
       <TabItem Header="View Assignments" Cursor="Hand">
         <controls:WorkTableControl/>
       </TabItem>
       <TabItem Header="Edit Assignments" Cursor="Hand">
-        <TextBlock Margin="5">This is tab 2 content</TextBlock>
+        <controls:EditUserWorkPositionControl DataContext="{Binding EditUserWorkPositionViewModel}"/>
       </TabItem>
       <TabItem Header="Add New" Cursor="Hand">
         <controls:NewUserFormControl/>

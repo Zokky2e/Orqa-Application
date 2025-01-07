@@ -4,6 +4,8 @@ using MySqlX.XDevAPI.Common;
 using Orqa_Application.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
 using System.IO;
 using System.Transactions;
 
@@ -17,6 +19,58 @@ namespace Orqa_Application.Services
         public UserService(ConnectionService connectionService) 
         {
             ConnectionService = connectionService;
+        }
+
+        public ObservableCollection<UserWorkPositionModel> GetAvailableUsers()
+        {
+            var availableUsers = new ObservableCollection<UserWorkPositionModel>();
+
+            string query = @"SELECT
+                u.id uid, u.username, u.firstname, u.lastname, 
+                uwp.id uwpid, uwp.productName, uwp.dateCreated,
+                wp.id wpid, wp.name, wp.description
+                FROM `users` u 
+                inner join `user_roles` ur on ur.userId = u.id 
+                left join `user_work_positions` uwp on uwp.userId = u.id 
+                left join `work_positions` wp on uwp.work_positionId = wp.id 
+                where ur.roleId != 1;";
+
+            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
+            command.CommandTimeout = 60;
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                MySqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        var user = new UserWorkPositionModel();
+                        user.User.Id = reader.GetInt32("uid");
+                        user.User.Username = reader.GetString("username");
+                        user.User.Firstname = reader.GetString("firstname");
+                        user.User.Lastname = reader.GetString("lastname");
+                        if (!reader.IsDBNull("uwpid"))
+                        {
+                            user.Id = reader.GetInt32("uwpid");
+                            user.ProductName = reader.GetString("productName");
+                            user.DateCreated = reader.GetDateTime("dateCreated");
+                            user.WorkPosition.Id = reader.GetInt32("wpid");
+                            user.WorkPosition.Name = reader.GetString("name");
+                            user.WorkPosition.Description = reader.GetString("description");
+                        }
+                        availableUsers.Add(user);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+            return availableUsers;
         }
 
         public void AddUser(UserModel user, string password)

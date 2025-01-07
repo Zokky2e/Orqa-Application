@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using DynamicData;
+using MySql.Data.MySqlClient;
 using Orqa_Application.Models;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,43 @@ namespace Orqa_Application.Services
                 ConnectionService.MySqlConnection.Close();
             }
         }
+
+        public ObservableCollection<WorkPositionModel> GetWorkPositions()
+        {
+            var workPositions = new ObservableCollection<WorkPositionModel>();
+
+            string query = "select * from `work_positions`";
+
+            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
+            command.CommandTimeout = 60;
+            try
+            {
+                ConnectionService.MySqlConnection.Open();
+                MySqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        var workPosition = new WorkPositionModel()
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Description = reader.GetString(2)
+                        };
+                        workPositions.Add(workPosition);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                ConnectionService.MySqlConnection.Close();
+            }
+            return workPositions;
+        }
+
         public ObservableCollection<UserWorkPositionModel> GetUserWorkPositions()
         {
             var workpositions = new ObservableCollection<UserWorkPositionModel>();

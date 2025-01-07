@@ -8,7 +8,7 @@ using System.Data;
 
 namespace Orqa_Application.ViewModels
 {
-    public partial class LoginViewModel : ViewModelBase
+    public partial class LoginViewModel : ObservableViewModelBase
     {
         private readonly NavigationService _navigationService;
         private readonly UserService _userService;

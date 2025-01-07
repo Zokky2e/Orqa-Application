@@ -12,6 +12,7 @@ namespace Orqa_Application.Models
         public string Username { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
+        public string Fullname => $"{Firstname} {Lastname}";
         public RoleModel Role { get; set; }
 
         public UserModel() 
