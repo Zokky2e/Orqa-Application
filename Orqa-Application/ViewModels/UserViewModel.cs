@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using Orqa_Application.Models;
 using Orqa_Application.Services;
@@ -18,19 +19,17 @@ namespace Orqa_Application.ViewModels
         public UserCardControlViewModel UserCardViewModel { get; }
         public bool HasWorkPosition { get; set; } = false;
 
-        public UserViewModel(
-            NavigationService navigationService,
-            UserService userService)
+        public UserViewModel(IServiceProvider services)
         {
-            _navigationService = navigationService;
-            _userService = userService;
+            _navigationService = services.GetRequiredService<NavigationService>();
+            _userService = services.GetRequiredService<UserService>();
             UserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
             LogoutCommand = new RelayCommand(OnLogout);
         }
         private void OnLogout()
         {
             _userService.ClearSession();
-            _navigationService.RedirectLoggedInUser(0);
+            _navigationService.NavigateTo("login");
         }
     }
 }

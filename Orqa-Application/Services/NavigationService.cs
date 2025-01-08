@@ -10,53 +10,30 @@ using Avalonia;
 using System.IO;
 using Orqa_Application.ViewModels;
 using ReactiveUI;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Orqa_Application.Services
 {
     public class NavigationService
     {
-        UserService UserService;
-        WorkPositionService WorkPositionService;
-        public NavigationService(UserService userService, WorkPositionService workPositionService) 
+        private readonly IServiceProvider _services;
+
+        public event Action<object>? ViewChanged;
+        public NavigationService(IServiceProvider services)
         {
-            UserService = userService;
-            WorkPositionService = workPositionService;
+            _services = services;
         }
-        public void RedirectLoggedInUser(int userId, string? role = null)
+        public void NavigateTo(string viewName, object? parameter = null)
         {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            object viewModel = viewName.ToLower() switch
             {
-                desktop.MainWindow?.Hide();
-                Window targetWindow;
-                if (role == null)
-                {
-                    var loginViewModel = new LoginViewModel(this, UserService, UserService.ConnectionService);
-                    targetWindow = new LoginWindow
-                    {
-                        DataContext = loginViewModel
-                    };
-                }
-                else if (role == "admin")
-                {
-                    var adminViewModel = new AdminViewModel(this, UserService, WorkPositionService);
+                "admin" => _services.GetRequiredService<AdminViewModel>(),
+                "user" => _services.GetRequiredService<UserViewModel>(),
+                "login" => _services.GetRequiredService<LoginViewModel>(),
+                _ => _services.GetRequiredService<LoginViewModel>(),
+            };
 
-                    targetWindow = new AdminWindow()
-                    {
-                        DataContext = adminViewModel
-                    };
-                }
-                else
-                {
-                    var userViewModel = new UserViewModel(this, UserService);
-
-                    targetWindow = new UserWindow()
-                    {
-                        DataContext = userViewModel
-                    };
-                }
-                desktop.MainWindow = targetWindow;
-                desktop.MainWindow.Show();
-            }
+            ViewChanged?.Invoke(viewModel);
         }
     }
 }

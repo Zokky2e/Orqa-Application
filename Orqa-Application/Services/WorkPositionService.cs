@@ -1,6 +1,9 @@
 ﻿using Avalonia.Win32.Interop.Automation;
 using DynamicData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Orqa_Application.Data;
 using Orqa_Application.Models;
 using System;
 using System.Collections.Generic;
@@ -15,10 +18,11 @@ namespace Orqa_Application.Services
 {
     public class WorkPositionService
     {
-        public ConnectionService ConnectionService { get; set; }
-        public WorkPositionService(ConnectionService connectionService)
+        private readonly WorkstationDbContext _dbContext;
+
+        public WorkPositionService(WorkstationDbContext dbContext)
         {
-            ConnectionService = connectionService;
+            _dbContext = dbContext;
         }
         public void AddWorkPosition(WorkPositionModel workPosition)
         {
@@ -26,31 +30,16 @@ namespace Orqa_Application.Services
             {
                 return;
             }
-            MySqlTransaction transaction = null;
-            string addWorkPositionQuery = "INSERT INTO `work_positions` (`id`, `name`, `description`) VALUES(NULL, @Name, @Description)";
+            var transaction = _dbContext.Database.BeginTransaction();
             try
             {
-                ConnectionService.MySqlConnection.Open();
-                transaction = ConnectionService.MySqlConnection.BeginTransaction();
-                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
-                {
-                    command.Connection = ConnectionService.MySqlConnection; 
-                    command.CommandText = addWorkPositionQuery;
-                    command.Parameters.AddWithValue("@Name", workPosition.Name);
-                    command.Parameters.AddWithValue("@Description", workPosition.Description);
-                    command.CommandTimeout = 60;
-                    command.ExecuteNonQuery();
-                    transaction.Commit();
-                }
+                _dbContext.Add(workPosition);
+                _dbContext.SaveChanges();
+                transaction.Commit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                transaction?.Rollback();
-                throw new Exception("Error adding work position", ex);
-            }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
+                transaction.Rollback();
             }
         }
 
@@ -80,229 +69,127 @@ namespace Orqa_Application.Services
         }
         private void DeleteUserWorkPosition(int userId)
         {
-            MySqlTransaction transaction = null;
-            string query = @"DELETE
-            FROM
-                user_work_positions
-            WHERE
-                userId = @UserId";
+            var transaction = _dbContext.Database.BeginTransaction();
             try
             {
-                ConnectionService.MySqlConnection.Open();
-                transaction = ConnectionService.MySqlConnection.BeginTransaction();
-                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                var userWorkPosition = _dbContext.UserWorkPositions.Where(uwp => uwp.UserId == userId).FirstOrDefault();
+                if (userWorkPosition != null)
                 {
-                    command.Connection = ConnectionService.MySqlConnection;
-                    command.CommandText = query;
-                    command.Parameters.AddWithValue("@UserId", userId);
-                    command.CommandTimeout = 60;
-                    command.ExecuteNonQuery();
+                    _dbContext.Remove(userWorkPosition);
+                    _dbContext.SaveChanges();
                     transaction.Commit();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                transaction?.Rollback();
-                throw new Exception("Error adding work position", ex);
-            }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
+                transaction.Rollback();
             }
         }
 
         private bool CheckUserWorkPositionExists(int userId)
         {
-            bool hasUser = false;
-            string query = "select exists (select 1 from user_work_positions where userId = @UserId limit 1) num";
-            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
             try
             {
-                ConnectionService.MySqlConnection.Open();
-                command.Parameters.AddWithValue("@UserId", userId);
-                MySqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    reader.Read();
-                    hasUser = reader.GetInt32("num") > 0;
-                }
+                bool hasUser = _dbContext.UserWorkPositions
+                    .Any(uwp => uwp.UserId == userId);
+
+                return hasUser;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error adding work position", ex);
+                // Handle exception, log if necessary
+                throw new Exception("Error checking work position existence", ex);
             }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
-            }
-            return hasUser;
         }
 
         private void UpdateUserWorkPosition(UserWorkPositionModel userWorkPositionModel)
         {
-            string query = @"update user_work_positions
-                set
-                user_work_positions.work_positionId = @WorkPositionId,
-                user_work_positions.productName = @ProductName,
-                user_work_positions.dateCreated = @DateCreated
-                WHERE
-                user_work_positions.userId = @UserId;";
-            MySqlTransaction transaction = null;
             try
             {
-                ConnectionService.MySqlConnection.Open();
-                transaction = ConnectionService.MySqlConnection.BeginTransaction();
-                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                var existingUserWorkPosition = _dbContext.UserWorkPositions
+                    .FirstOrDefault(uwp => uwp.UserId == userWorkPositionModel.User.Id);
+
+                if (existingUserWorkPosition != null)
                 {
-                    command.Connection = ConnectionService.MySqlConnection;
-                    command.CommandText = query;
-                    command.Parameters.AddWithValue("@WorkPositionId", userWorkPositionModel.WorkPosition.Id);
-                    command.Parameters.AddWithValue("@ProductName", userWorkPositionModel.ProductName);
-                    command.Parameters.AddWithValue("@DateCreated", DateTime.Now);
-                    command.Parameters.AddWithValue("@UserId", userWorkPositionModel.User.Id);
-                    command.CommandTimeout = 60;
-                    command.ExecuteNonQuery();
-                    transaction.Commit();
+                    existingUserWorkPosition.WorkPositionId = userWorkPositionModel.WorkPosition.Id;
+                    if (existingUserWorkPosition.ProductName != userWorkPositionModel.ProductName)
+                    {
+                        existingUserWorkPosition.ProductName = userWorkPositionModel.ProductName;
+                        existingUserWorkPosition.DateCreated = DateTime.Now;
+                    }
+                    _dbContext.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception("User work position not found.");
                 }
             }
             catch (Exception ex)
             {
-                transaction?.Rollback();
-                throw new Exception("Error adding work position", ex);
-            }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
+                throw new Exception("Error updating work position", ex);
             }
         }
         private void InsertUserWorkPosition(UserWorkPositionModel userWorkPositionModel)
         {
-            string query = @"insert into user_work_positions
-                (`id`, `userId`, `work_positionId`, `productName`, `dateCreated`) values (NULL, @UserId, @WorkPositionId, @ProductName, @DateCreated);";
-            MySqlTransaction transaction = null;
             try
             {
-                ConnectionService.MySqlConnection.Open();
-                transaction = ConnectionService.MySqlConnection.BeginTransaction();
-                using (MySqlCommand command = ConnectionService.MySqlConnection.CreateCommand())
+                // Create a new UserWorkPosition entity
+                var newUserWorkPosition = new UserWorkPositionModel
                 {
-                    command.Connection = ConnectionService.MySqlConnection;
-                    command.CommandText = query;
-                    command.Parameters.AddWithValue("@WorkPositionId", userWorkPositionModel.WorkPosition.Id);
-                    command.Parameters.AddWithValue("@ProductName", userWorkPositionModel.ProductName);
-                    command.Parameters.AddWithValue("@DateCreated", DateTime.Now);
-                    command.Parameters.AddWithValue("@UserId", userWorkPositionModel.User.Id);
-                    command.CommandTimeout = 60;
-                    command.ExecuteNonQuery();
-                    transaction.Commit();
-                }
+                    UserId = userWorkPositionModel.User.Id,
+                    WorkPositionId = userWorkPositionModel.WorkPosition.Id,
+                    ProductName = userWorkPositionModel.ProductName,
+                    DateCreated = DateTime.Now
+                };
+                _dbContext.UserWorkPositions.Add(newUserWorkPosition);
+                _dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                transaction?.Rollback();
-                throw new Exception("Error adding work position", ex);
-            }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
+                throw new Exception("Error inserting work position", ex);
             }
         }
 
         public ObservableCollection<WorkPositionModel> GetWorkPositions()
         {
-            var workPositions = new ObservableCollection<WorkPositionModel>();
-
-            string query = "select * from `work_positions`";
-
-            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
-            command.CommandTimeout = 60;
-            try
-            {
-                ConnectionService.MySqlConnection.Open();
-                MySqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        var workPosition = new WorkPositionModel()
-                        {
-                            Id = reader.GetInt32(0),
-                            Name = reader.GetString(1),
-                            Description = reader.GetString(2)
-                        };
-                        workPositions.Add(workPosition);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
-            }
-            return workPositions;
+            var workPositionsList = _dbContext.WorkPositions
+                            .ToList();
+            return new ObservableCollection<WorkPositionModel>(workPositionsList);
         }
 
         public ObservableCollection<UserWorkPositionModel> GetUserWorkPositions()
         {
-            var workpositions = new ObservableCollection<UserWorkPositionModel>();
-
-            string query = @"SELECT 
-            user_work_positions.id, 
-            work_positions.id,
-            work_positions.name,
-            work_positions.description,
-            user_work_positions.productName,
-            user_work_positions.dateCreated,
-            users.id,
-            users.username,
-            users.firstname,
-            users.lastname
-            FROM user_work_positions 
-            INNER JOIN users ON user_work_positions.userId = users.id 
-            INNER JOIN work_positions ON work_positions.id = user_work_positions.work_positionId";
-            MySqlCommand command = new MySqlCommand(query, ConnectionService.MySqlConnection);
-            command.CommandTimeout = 60;
             try
             {
-                ConnectionService.MySqlConnection.Open();
-                MySqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while(reader.Read()) {
-                        var userWorkPosition = new UserWorkPositionModel()
+                var workPositions = _dbContext.UserWorkPositions
+                    .Include(uwp => uwp.WorkPosition)
+                    .Include(uwp => uwp.User)
+                    .Select(uwp => new UserWorkPositionModel
+                    {
+                        Id = uwp.Id,
+                        ProductName = uwp.ProductName,
+                        DateCreated = uwp.DateCreated,
+                        WorkPosition = new WorkPositionModel
                         {
-                            Id = reader.GetInt32(0),
-                            WorkPosition = new WorkPositionModel()
-                            {
-                                Id = reader.GetInt32(1),
-                                Name = reader.GetString(2),
-                                Description = reader.GetString(3)
-                            },
-                            ProductName = reader.GetString(4),
-                            DateCreated = reader.GetDateTime(5),
-                            User = new UserModel()
-                            {
-                                Id = reader.GetInt32(6),
-                                Username = reader.GetString(7),
-                                Firstname = reader.GetString(8),
-                                Lastname = reader.GetString(9),
-                            },
-                        };
-                        workpositions.Add(userWorkPosition);
-                    }
-                   
-                }
+                            Id = uwp.WorkPosition.Id,
+                            Name = uwp.WorkPosition.Name,
+                            Description = uwp.WorkPosition.Description
+                        },
+                        User = new UserModel
+                        {
+                            Id = uwp.User.Id,
+                            Username = uwp.User.Username,
+                            Firstname = uwp.User.Firstname,
+                            Lastname = uwp.User.Lastname
+                        }
+                    })
+                    .ToList();
+                return new ObservableCollection<UserWorkPositionModel>(workPositions);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
-            finally
-            {
-                ConnectionService.MySqlConnection.Close();
-            }
-            return workpositions;
+            return new ObservableCollection<UserWorkPositionModel>();
         }
 
     }

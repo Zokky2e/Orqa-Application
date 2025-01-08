@@ -1,22 +1,23 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Orqa_Application.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Orqa_Application.ViewModels;
-using ReactiveUI;
+using System;
 
 namespace Orqa_Application.Views
 {
-    public partial class AdminWindow : Window
+    public partial class UserView : UserControl
     {
-        public AdminWindow()
+        public UserView()
         {
             InitializeComponent();
-            this.Opened += (s, e) =>
-            {
-                (this.DataContext as AdminViewModel)?.GetWorkPositions();
-            };
         }
+        public UserView(IServiceProvider services): this()
+        {
+            DataContext = services.GetRequiredService<UserViewModel>();
+        }
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);

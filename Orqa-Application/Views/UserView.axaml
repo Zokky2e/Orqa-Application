@@ -1,17 +1,14 @@
         
-<Window
-        x:Class="Orqa_Application.Views.UserWindow"
+<UserControl
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Orqa_Application.Views.UserView"
         xmlns:controls="using:Orqa_Application.Controls"
         xmlns:vm="using:Orqa_Application.ViewModels"
         x:CompileBindings="False"
-        mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen"
-        SizeToContent="WidthAndHeight"
-        Title="user">
+        mc:Ignorable="d">
 
 
   <Grid RowDefinitions="120,auto" ColumnDefinitions="auto,auto">
@@ -24,4 +21,4 @@
       Logout
     </Button>
   </Grid>
-</Window>
+</UserControl>

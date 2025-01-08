@@ -1,14 +1,12 @@
-<Window x:Class="Orqa_Application.Views.LoginWindow"
+<UserControl 
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Orqa_Application.Views.LoginView"
         xmlns:vm="using:Orqa_Application.ViewModels"
         x:CompileBindings="False"
-        mc:Ignorable="d"
-        Title="Login"
-        WindowStartupLocation="CenterScreen"
-        SizeToContent="WidthAndHeight">
+        mc:Ignorable="d">
 
   <Grid RowDefinitions="Auto, *, Auto"
           x:Name="Root">
@@ -26,4 +24,4 @@
     <TextBlock IsEnabled="{Binding HasResult, Mode=OneWay}" Text="{Binding Result}" Foreground="Red"/>
   </StackPanel>
   </Grid>
-</Window>
+</UserControl>

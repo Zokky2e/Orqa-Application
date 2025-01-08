@@ -28,11 +28,14 @@
     </PackageReference>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
     <PackageReference Include="MySql.Data" Version="9.1.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaXaml Update="Views\LoginWindow.axaml">
+    <AvaloniaXaml Update="Views\LoginView.axaml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </AvaloniaXaml>
   </ItemGroup>
@@ -41,11 +44,14 @@
     <Compile Update="Controls\WorkTableControl.axaml.cs">
       <DependentUpon>WorkTableControl.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\UserWindow.axaml.cs">
-      <DependentUpon>UserWindow.axaml</DependentUpon>
+    <Compile Update="Views\LoginView.axaml.cs">
+      <DependentUpon>LoginView.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\AdminWindow.axaml.cs">
-      <DependentUpon>AdminWindow.axaml</DependentUpon>
+    <Compile Update="Views\UserView.axaml.cs">
+      <DependentUpon>UserView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AdminView.axaml.cs">
+      <DependentUpon>AdminView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

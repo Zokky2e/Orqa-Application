@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Reactive;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Orqa_Application.ViewModels
 {
@@ -45,14 +46,11 @@ namespace Orqa_Application.ViewModels
         public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; } = new ObservableCollection<UserWorkPositionModel>();
         public UserCardControlViewModel AdminUserCardViewModel { get; }
         public EditUserWorkPositionViewModel EditUserWorkPositionViewModel { get; }
-        public AdminViewModel(
-            NavigationService navigationService, 
-            UserService userService, 
-            WorkPositionService workPositionService)
+        public AdminViewModel(IServiceProvider services)
         {
-            _navigationService = navigationService;
-            _userService = userService;
-            _workPositionService = workPositionService;
+            _navigationService = services.GetRequiredService<NavigationService>();
+            _userService = services.GetRequiredService<UserService>();
+            _workPositionService = services.GetRequiredService<WorkPositionService>();
             AdminUserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
             EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers(), GetWorkPositions);
 
@@ -106,7 +104,7 @@ namespace Orqa_Application.ViewModels
         private void OnLogout()
         {
             _userService.ClearSession();
-            _navigationService.RedirectLoggedInUser(0);
+            _navigationService.NavigateTo("login");
         }
 
         public void GetWorkPositions()
