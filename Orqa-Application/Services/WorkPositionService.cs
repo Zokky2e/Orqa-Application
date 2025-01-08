@@ -52,17 +52,14 @@ namespace Orqa_Application.Services
             }
             else
             {
-                // Check if an entry for the user already exists
                 bool userWorkPositionExists = CheckUserWorkPositionExists(userWorkPosition.User.Id);
 
                 if (userWorkPositionExists)
                 {
-                    // Update the existing user work position entry
                     UpdateUserWorkPosition(userWorkPosition);
                 }
                 else
                 {
-                    // Insert a new user work position entry
                     InsertUserWorkPosition(userWorkPosition);
                 }
             }
@@ -97,7 +94,6 @@ namespace Orqa_Application.Services
             }
             catch (Exception ex)
             {
-                // Handle exception, log if necessary
                 throw new Exception("Error checking work position existence", ex);
             }
         }
@@ -133,7 +129,6 @@ namespace Orqa_Application.Services
         {
             try
             {
-                // Create a new UserWorkPosition entity
                 var newUserWorkPosition = new UserWorkPositionModel
                 {
                     UserId = userWorkPositionModel.User.Id,
