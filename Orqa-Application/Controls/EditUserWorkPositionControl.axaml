@@ -16,7 +16,7 @@
               Width="200" MaxDropDownHeight="300">
         <ComboBox.ItemTemplate>
           <DataTemplate>
-            <TextBlock Text="{Binding User.Fullname}"/>
+            <TextBlock Text="{Binding Fullname}"/>
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>
@@ -36,7 +36,7 @@
     </StackPanel>
     <StackPanel Margin="20 0">
       <TextBlock Margin="0 5" Text="2. Insert product name" FontWeight="DemiBold"/>
-      <TextBox Text="{Binding SelectedUser.ProductName}"/>
+      <TextBox Text="{Binding SelectedUser.UserWorkPosition.ProductName}"/>
     </StackPanel>
     <StackPanel Margin="20 30">
       <Button Command="{Binding UpdateWorkPositionCommand}" Content="Update" Cursor="Hand"/>

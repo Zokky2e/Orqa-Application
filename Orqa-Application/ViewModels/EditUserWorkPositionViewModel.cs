@@ -27,17 +27,17 @@ namespace Orqa_Application.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedWorkPosition, value);
         }
 
-        public ObservableCollection<UserWorkPositionModel> AvailableUserList { get; } = new ObservableCollection<UserWorkPositionModel>();
+        public ObservableCollection<UserModel> AvailableUserList { get; } = new ObservableCollection<UserModel>();
 
-        private UserWorkPositionModel? _selectedUser;
-        public UserWorkPositionModel? SelectedUser
+        private UserModel? _selectedUser;
+        public UserModel? SelectedUser
         {
             get => _selectedUser;
             set => this.RaiseAndSetIfChanged(ref _selectedUser, value);
         }
         public EditUserWorkPositionViewModel(
             WorkPositionService workPositionService,
-            ObservableCollection<UserWorkPositionModel> availabelUsers,
+            ObservableCollection<UserModel> availabelUsers,
             Action onWorkPositionUpdated)
         {
             _workPositionService = workPositionService;
@@ -49,9 +49,9 @@ namespace Orqa_Application.ViewModels
             this.WhenAnyValue(vm => vm.SelectedUser)
             .Subscribe(user =>
             {
-                if (user?.WorkPosition != null && user.WorkPosition.Name != string.Empty)
+                if (user?.UserWorkPosition != null && user.UserWorkPosition.WorkPosition.Name != string.Empty)
                 {
-                    SelectedWorkPosition = WorkPositionList.FirstOrDefault(wp => wp.Name == user.WorkPosition.Name);
+                    SelectedWorkPosition = WorkPositionList.FirstOrDefault(wp => wp.Name == user.UserWorkPosition.WorkPosition.Name);
                 }
                 else
                 {
@@ -71,14 +71,16 @@ namespace Orqa_Application.ViewModels
 
             if (SelectedWorkPosition?.Name == "No work")
             {
-                SelectedUser.WorkPosition = new WorkPositionModel();
+                SelectedUser.UserWorkPosition = new UserWorkPositionModel();
+                SelectedUser.UserWorkPosition.WorkPosition = new WorkPositionModel();
             }
             else
             {
-                SelectedUser.WorkPosition = SelectedWorkPosition;
+                SelectedUser.UserWorkPosition.WorkPosition = SelectedWorkPosition;
             }
-            _workPositionService.UpadateWorkPosition(SelectedUser);
+            _workPositionService.UpadateWorkPosition(SelectedUser.UserWorkPosition);
             _onWorkPositionUpdated?.Invoke();
         }
+
     }
 }

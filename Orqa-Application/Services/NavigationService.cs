@@ -32,8 +32,16 @@ namespace Orqa_Application.Services
                 "login" => _services.GetRequiredService<LoginViewModel>(),
                 _ => _services.GetRequiredService<LoginViewModel>(),
             };
+            UserControl view = viewName.ToLower() switch
+            {
+                "admin" => _services.GetRequiredService<AdminView>(),
+                "user" => _services.GetRequiredService<UserView>(),
+                "login" => _services.GetRequiredService<LoginView>(),
+                _ => _services.GetRequiredService<LoginView>(),
+            };
 
-            ViewChanged?.Invoke(viewModel);
+            view.DataContext = viewModel;
+            ViewChanged?.Invoke(view);
         }
     }
 }

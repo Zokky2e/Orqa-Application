@@ -30,13 +30,17 @@ namespace Orqa_Application.Services
             _dbContext = dbContext;
         }
 
-        public ObservableCollection<UserWorkPositionModel> GetAvailableUsers()
+        public ObservableCollection<UserModel> GetAvailableUsers()
         {
             var userList = _dbContext.Users
                             .Where(u => u.RoleId != 1)
-                            .Select(u => u.UserWorkPosition ?? new UserWorkPositionModel())
+                            .Include(u => u.UserWorkPosition)
                             .ToList();
-            return new ObservableCollection<UserWorkPositionModel>(userList);
+            foreach (var user in userList)
+            {
+                user.UserWorkPosition ??= new UserWorkPositionModel();
+            }
+            return new ObservableCollection<UserModel>(userList);
         }
 
         public void AddUser(UserModel user, string password)
@@ -45,7 +49,7 @@ namespace Orqa_Application.Services
             {
                 return;
             }
-            if (string.IsNullOrWhiteSpace(password) && password.Length > 8) {
+            if (!string.IsNullOrWhiteSpace(password) && password.Length > 8) {
                 var transaction = _dbContext.Database.BeginTransaction();
                 user.Password = BCrypt.Net.BCrypt.HashPassword(password);
                 try

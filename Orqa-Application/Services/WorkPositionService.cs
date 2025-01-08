@@ -186,7 +186,7 @@ namespace Orqa_Application.Services
                     .ToList();
                 return new ObservableCollection<UserWorkPositionModel>(workPositions);
             }
-            catch (Exception)
+            catch (Exception e)
             {
             }
             return new ObservableCollection<UserWorkPositionModel>();

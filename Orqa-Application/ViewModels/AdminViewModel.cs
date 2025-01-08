@@ -43,7 +43,38 @@ namespace Orqa_Application.ViewModels
             get => _newUserPassword;
             set => this.RaiseAndSetIfChanged(ref _newUserPassword, value); 
         }
-        public ObservableCollection<UserWorkPositionModel> UserWorkPositionList { get; } = new ObservableCollection<UserWorkPositionModel>();
+        private string _userError;
+        public string UserError
+        {
+            get => _userError;
+            set => this.RaiseAndSetIfChanged(ref _userError, value);
+        }
+        private bool _hasWPError;
+        public bool HasWPError
+        {
+            get => _hasWPError;
+            set => this.RaiseAndSetIfChanged(ref _hasWPError, value);
+        }
+
+        private string _wPError;
+        public string WPError
+        {
+            get => _wPError;
+            set => this.RaiseAndSetIfChanged(ref _wPError, value);
+        }
+        private bool _hasUserError;
+        public bool HasUserError
+        {
+            get => _hasUserError;
+            set => this.RaiseAndSetIfChanged(ref _hasUserError, value);
+        }
+
+        private ObservableCollection<UserWorkPositionModel> _userWorkPositionList;
+        public ObservableCollection<UserWorkPositionModel> UserWorkPositionList
+        {
+            get => _userWorkPositionList;
+            set => this.RaiseAndSetIfChanged(ref _userWorkPositionList, value);
+        }
         public UserCardControlViewModel AdminUserCardViewModel { get; }
         public EditUserWorkPositionViewModel EditUserWorkPositionViewModel { get; }
         public AdminViewModel(IServiceProvider services)
@@ -52,6 +83,8 @@ namespace Orqa_Application.ViewModels
             _userService = services.GetRequiredService<UserService>();
             _workPositionService = services.GetRequiredService<WorkPositionService>();
             AdminUserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
+            UserWorkPositionList = new ObservableCollection<UserWorkPositionModel>();
+            GetWorkPositions();
             EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers(), GetWorkPositions);
 
             LogoutCommand = new RelayCommand(OnLogout);
@@ -69,8 +102,16 @@ namespace Orqa_Application.ViewModels
             if (string.IsNullOrWhiteSpace(NewUser.Username) ||
             string.IsNullOrWhiteSpace(NewUser.Firstname) ||
             string.IsNullOrWhiteSpace(NewUser.Lastname) ||
-            string.IsNullOrWhiteSpace(NewUserPassword) || NewUserPassword.Length < 8)
+            string.IsNullOrWhiteSpace(NewUserPassword))
             {
+                HasUserError = true;
+                UserError = "Some fields are empty.";
+                return;
+            }
+            if (NewUserPassword.Length < 8)
+            {
+                HasUserError = true;
+                UserError = "Password too short.";
                 return;
             }
             try
@@ -78,6 +119,14 @@ namespace Orqa_Application.ViewModels
                 _userService.AddUser(NewUser, NewUserPassword);
                 NewUser = new UserModel();
                 NewUserPassword = string.Empty;
+                EditUserWorkPositionViewModel.AvailableUserList.Clear();
+                var updatedUsers = _userService.GetAvailableUsers();
+                foreach (var user in updatedUsers)
+                {
+                    EditUserWorkPositionViewModel.AvailableUserList.Add(user);
+                }
+                HasUserError = false;
+                UserError = string.Empty;
             }
             catch (Exception ex)
             {
@@ -89,6 +138,8 @@ namespace Orqa_Application.ViewModels
             if (string.IsNullOrWhiteSpace(NewWorkPosition.Name) ||
             string.IsNullOrWhiteSpace(NewWorkPosition.Description))
             {
+                HasWPError = true;
+                WPError = "Some fields are empty.";
                 return;
             }
             try
@@ -96,6 +147,14 @@ namespace Orqa_Application.ViewModels
                 _workPositionService.AddWorkPosition(NewWorkPosition);
 
                 NewWorkPosition = new WorkPositionModel();
+                EditUserWorkPositionViewModel.WorkPositionList.Clear();
+                var updatedWorkPositions = _workPositionService.GetWorkPositions();
+                foreach (var workPosition in updatedWorkPositions)
+                {
+                    EditUserWorkPositionViewModel.WorkPositionList.Add(workPosition);
+                }
+                HasWPError = false;
+                WPError = string.Empty;
             }
             catch (Exception ex)
             {
@@ -115,6 +174,7 @@ namespace Orqa_Application.ViewModels
             {
                 UserWorkPositionList.Add(item);
             }
+            this.RaiseAndSetIfChanged(ref _userWorkPositionList, UserWorkPositionList);
         }
     }
 }

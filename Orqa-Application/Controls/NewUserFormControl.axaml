@@ -19,6 +19,7 @@
       <TextBlock Text="Password:"/>
       <TextBox Text="{Binding NewUserPassword, Mode=TwoWay}" Margin="0,5"/>
       <Button Command="{Binding AddNewUserCommand}">Add</Button>
+      <TextBlock IsEnabled="{Binding HasUserError, Mode=OneWay}" Text="{Binding UserError}" Foreground="Red"/>
     </StackPanel>
     <StackPanel Grid.Column="1" Margin="15" Width="280" HorizontalAlignment="Center" VerticalAlignment="Top">
       <TextBlock Text="Add new work position" FontWeight="SemiBold" FontSize="24"/>
@@ -27,6 +28,7 @@
       <TextBlock Text="Description:"/>
       <TextBox Text="{Binding NewWorkPosition.Description, Mode=TwoWay}" Margin="0,5"/>
       <Button Command="{Binding AddNewWPCommand}">Add</Button>
+      <TextBlock IsEnabled="{Binding HasWPError, Mode=OneWay}" Text="{Binding WPError}" Foreground="Red"/>
     </StackPanel>
   </Grid>
 </UserControl>

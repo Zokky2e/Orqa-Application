@@ -59,18 +59,23 @@ namespace Orqa_Application
             services.AddTransient<MainWindow>();
 
             // Register services
-            services.AddTransient<UserService>();
+            services.AddSingleton<UserService>();
             services.AddTransient<WorkPositionService>();
             services.AddTransient<NavigationService>();
 
             // Register ViewModels
             services.AddSingleton<MainViewModel>();
+            services.AddTransient<LoginViewModel>();
             services.AddTransient<AdminViewModel>();
             services.AddTransient<EditUserWorkPositionViewModel>();
-            services.AddTransient<LoginViewModel>();
             services.AddSingleton<UserCardControlViewModel>();
             services.AddTransient<UserViewModel>();
             services.AddTransient<WorkTableViewModel>();
+
+            // Register Views
+            services.AddTransient<AdminView>();
+            services.AddTransient<UserView>();
+            services.AddTransient<LoginView>();
         }
 
         private void DisableAvaloniaDataAnnotationValidation()

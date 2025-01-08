@@ -18,10 +18,8 @@ namespace Orqa_Application.Views
         public AdminView(IServiceProvider services) : this()
         {
             DataContext = services.GetRequiredService<AdminViewModel>();
-            //this. += (s, e) =>
-            //{
-            //    (DataContext as AdminViewModel)?.GetWorkPositions();
-            //};
+            var viewModel = DataContext as AdminViewModel;
+            viewModel?.GetWorkPositions();
         }
         private void InitializeComponent()
         {
