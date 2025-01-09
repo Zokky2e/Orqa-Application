@@ -71,13 +71,16 @@ namespace Orqa_Application.ViewModels
 
             if (SelectedWorkPosition?.Name == "No work")
             {
-                SelectedUser.UserWorkPosition = new UserWorkPositionModel();
                 SelectedUser.UserWorkPosition.WorkPosition = new WorkPositionModel();
+                SelectedUser.UserWorkPosition = new UserWorkPositionModel();
             }
             else
             {
                 SelectedUser.UserWorkPosition.WorkPosition = SelectedWorkPosition;
             }
+
+            SelectedUser.UserWorkPosition.User = SelectedUser;
+            SelectedUser.UserWorkPosition.UserId = SelectedUser.Id;
             _workPositionService.UpadateWorkPosition(SelectedUser.UserWorkPosition);
             _onWorkPositionUpdated?.Invoke();
         }

@@ -35,11 +35,11 @@ namespace Orqa_Application.Services
             {
                 _dbContext.Add(workPosition);
                 _dbContext.SaveChanges();
-                transaction.Commit();
+                _dbContext.Database.CommitTransaction();
             }
             catch (Exception)
             {
-                transaction.Rollback();
+                _dbContext.Database.RollbackTransaction();
             }
         }
 
@@ -69,17 +69,19 @@ namespace Orqa_Application.Services
             var transaction = _dbContext.Database.BeginTransaction();
             try
             {
-                var userWorkPosition = _dbContext.UserWorkPositions.Where(uwp => uwp.UserId == userId).FirstOrDefault();
+                var userWorkPosition = _dbContext.UserWorkPositions.Where(uwp => uwp.UserId == userId)
+                    .Include(uwp => uwp.WorkPosition)
+                    .FirstOrDefault();
                 if (userWorkPosition != null)
                 {
                     _dbContext.Remove(userWorkPosition);
                     _dbContext.SaveChanges();
-                    transaction.Commit();
+                    _dbContext.Database.CommitTransaction();
                 }
             }
             catch (Exception)
             {
-                transaction.Rollback();
+                _dbContext.Database.RollbackTransaction();
             }
         }
 
@@ -134,8 +136,12 @@ namespace Orqa_Application.Services
                     UserId = userWorkPositionModel.User.Id,
                     WorkPositionId = userWorkPositionModel.WorkPosition.Id,
                     ProductName = userWorkPositionModel.ProductName,
-                    DateCreated = DateTime.Now
+                    DateCreated = DateTime.Now,
+                    User = null,
+                    WorkPosition = null,
                 };
+                _dbContext.Entry(userWorkPositionModel.User).State = EntityState.Detached;
+                _dbContext.Entry(userWorkPositionModel.WorkPosition).State = EntityState.Detached;
                 _dbContext.UserWorkPositions.Add(newUserWorkPosition);
                 _dbContext.SaveChanges();
             }

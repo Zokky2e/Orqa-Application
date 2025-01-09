@@ -63,11 +63,11 @@ namespace Orqa_Application.Services
                         user.Role = role;
                         _dbContext.SaveChanges();
                     }
-                    transaction.Commit();
+                    _dbContext.Database.CommitTransaction();
                 }
                 catch (Exception)
                 {
-                    transaction.Rollback();
+                    _dbContext.Database.RollbackTransaction();
                 }
             }
             else
