@@ -61,7 +61,7 @@ namespace Orqa_Application
             // Register services
             services.AddSingleton<UserService>();
             services.AddTransient<WorkPositionService>();
-            services.AddTransient<NavigationService>();
+            services.AddSingleton<NavigationService>();
 
             // Register ViewModels
             services.AddSingleton<MainViewModel>();
