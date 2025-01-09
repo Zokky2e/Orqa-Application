@@ -66,11 +66,11 @@ namespace Orqa_Application
             // Register ViewModels
             services.AddSingleton<MainViewModel>();
             services.AddTransient<LoginViewModel>();
-            services.AddTransient<AdminViewModel>();
+            services.AddSingleton<AdminViewModel>();
             services.AddTransient<EditUserWorkPositionViewModel>();
             services.AddSingleton<UserCardControlViewModel>();
             services.AddTransient<UserViewModel>();
-            services.AddTransient<WorkTableViewModel>();
+            services.AddSingleton<WorkTableViewModel>();
 
             // Register Views
             services.AddTransient<AdminView>();

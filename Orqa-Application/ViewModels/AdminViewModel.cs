@@ -17,7 +17,6 @@ namespace Orqa_Application.ViewModels
     public partial class AdminViewModel : ReactiveViewModelBase
     {
         public IRelayCommand LogoutCommand { get; }
-        public IRelayCommand ReloadCommand { get; }
         public IRelayCommand AddNewUserCommand { get; }
         public IRelayCommand AddNewWPCommand { get; }
 
@@ -69,33 +68,26 @@ namespace Orqa_Application.ViewModels
             set => this.RaiseAndSetIfChanged(ref _hasUserError, value);
         }
 
-        private ObservableCollection<UserWorkPositionModel> _userWorkPositionList;
-        public ObservableCollection<UserWorkPositionModel> UserWorkPositionList
-        {
-            get => _userWorkPositionList;
-            set => this.RaiseAndSetIfChanged(ref _userWorkPositionList, value);
-        }
         public UserCardControlViewModel AdminUserCardViewModel { get; }
         public EditUserWorkPositionViewModel EditUserWorkPositionViewModel { get; }
+        public WorkTableViewModel WorkTableViewModel { get; }
         public AdminViewModel(IServiceProvider services)
         {
             _navigationService = services.GetRequiredService<NavigationService>();
             _userService = services.GetRequiredService<UserService>();
             _workPositionService = services.GetRequiredService<WorkPositionService>();
             AdminUserCardViewModel = new UserCardControlViewModel(_userService.CurrentUser, _userService.UserWorkPosition);
-            UserWorkPositionList = new ObservableCollection<UserWorkPositionModel>();
-            GetWorkPositions();
-            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers(), GetWorkPositions);
+            WorkTableViewModel = services.GetRequiredService<WorkTableViewModel>();
+            EditUserWorkPositionViewModel = new EditUserWorkPositionViewModel(_workPositionService, _userService.GetAvailableUsers(), UpdateWorkPositions);
 
             LogoutCommand = new RelayCommand(OnLogout);
-            ReloadCommand = new RelayCommand(OnReloadWorkPositions);
             AddNewUserCommand = new RelayCommand(OnAddNewUserCommand);
             AddNewWPCommand = new RelayCommand(OnAddNewWPCommand);
         }
 
-        private void OnReloadWorkPositions()
+        public void UpdateWorkPositions()
         {
-            GetWorkPositions();
+            WorkTableViewModel.GetWorkPositions();
         }
         private void OnAddNewUserCommand()
         {
@@ -146,13 +138,7 @@ namespace Orqa_Application.ViewModels
             {
                 _workPositionService.AddWorkPosition(NewWorkPosition);
 
-                NewWorkPosition = new WorkPositionModel();
-                EditUserWorkPositionViewModel.WorkPositionList.Clear();
-                var updatedWorkPositions = _workPositionService.GetWorkPositions();
-                foreach (var workPosition in updatedWorkPositions)
-                {
-                    EditUserWorkPositionViewModel.WorkPositionList.Add(workPosition);
-                }
+                WorkTableViewModel.GetWorkPositions();
                 HasWPError = false;
                 WPError = string.Empty;
             }
@@ -164,17 +150,6 @@ namespace Orqa_Application.ViewModels
         {
             _userService.ClearSession();
             _navigationService.NavigateTo("login");
-        }
-
-        public void GetWorkPositions()
-        {
-            var userWorkPositionModels = _workPositionService.GetUserWorkPositions();
-            UserWorkPositionList.Clear();
-            foreach (var item in userWorkPositionModels)
-            {
-                UserWorkPositionList.Add(item);
-            }
-            this.RaiseAndSetIfChanged(ref _userWorkPositionList, UserWorkPositionList);
         }
     }
 }

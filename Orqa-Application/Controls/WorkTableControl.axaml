@@ -6,7 +6,7 @@
              x:Class="Orqa_Application.Controls.WorkTableControl"
              xmlns:vm="using:Orqa_Application.ViewModels"
              xmlns:model="using:Orqa_Application.Models"
-             x:DataType="vm:AdminViewModel"
+             x:DataType="vm:WorkTableViewModel"
              Background="AliceBlue">
   <StackPanel>
 

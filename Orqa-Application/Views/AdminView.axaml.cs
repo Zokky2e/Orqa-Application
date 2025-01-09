@@ -19,7 +19,7 @@ namespace Orqa_Application.Views
         {
             DataContext = services.GetRequiredService<AdminViewModel>();
             var viewModel = DataContext as AdminViewModel;
-            viewModel?.GetWorkPositions();
+            viewModel?.UpdateWorkPositions();
         }
         private void InitializeComponent()
         {
